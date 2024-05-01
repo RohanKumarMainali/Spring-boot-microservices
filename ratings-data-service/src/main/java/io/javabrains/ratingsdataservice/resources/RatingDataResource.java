@@ -24,7 +24,7 @@ public class RatingDataResource {
     UserRating userRating = new UserRating(
         userId,
         Arrays.asList(
-            new Rating("100", 3),
+            new Rating("100", 2),
             new Rating("200", 4)));
 
     return userRating;

@@ -12,6 +12,8 @@ import org.springframework.web.client.RestTemplate;
 import io.javabrains.moviecatalogservice.models.Catalog;
 import io.javabrains.moviecatalogservice.models.Movie;
 import io.javabrains.moviecatalogservice.models.UserRating;
+import io.javabrains.moviecatalogservice.services.MovieInfoService;
+import io.javabrains.moviecatalogservice.services.RatingsDataService;
 
 @RestController
 @RequestMapping("/catalog")
@@ -20,19 +22,20 @@ public class MovieCatalogResource {
   @Autowired
   private RestTemplate restTemplate;
 
-  // @Autowired
-  // private WebClient.Builder webClientBuilder;
+  @Autowired
+  MovieInfoService movieInfoService;
+
+  @Autowired
+  RatingsDataService ratingsDataService;
 
   @RequestMapping("/{userId}")
   public List<Catalog> getCatalog(@PathVariable("userId") String userId) {
 
-    UserRating ratings = restTemplate.getForObject("http://ratings-data-service/ratings/users/1", UserRating.class);
+    UserRating ratings = ratingsDataService.getUserRating(userId);
     return ratings.getRatings().stream().map(rating -> {
-      Movie movie = restTemplate.getForObject("http://movie-info-service/movies/" +
-          rating.getMovieId(), Movie.class);
+      Movie movie = movieInfoService.getMovieInfo(rating.getMovieId());
       return new Catalog(movie.getMovieName(), movie.getMovieDescription(), rating.getRating());
     }).collect(Collectors.toList());
-
   }
 
 }
